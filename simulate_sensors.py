@@ -7,11 +7,31 @@ import json
 import time
 import random
 from datetime import datetime
+from config import MQTT_BROKER_HOST, MQTT_BROKER_PORT
+import os
+
+
+RESTART_FLAG = False  # Set this flag to True to trigger a database reset
+
+def reset_database_if_needed():
+    global RESTART_FLAG
+    db_path = "db/sensor_data.db"
+    if RESTART_FLAG:
+        try:
+            if os.path.exists(db_path):
+                os.remove(db_path)
+                print("Database reset: sensor_data.db deleted.")
+            else:
+                print("Database reset: sensor_data.db does not exist.")
+        except Exception as e:
+            print(f"Error deleting database: {e}")
+        finally:
+            RESTART_FLAG = False
+
+
 
 # MQTT Configuration
-MQTT_BROKER_HOST = "localhost"
-MQTT_BROKER_PORT = 1883
-MQTT_TOPIC_PREFIX = "sensors"
+MQTT_TOPIC_PREFIX = "topic/sensor"
 MQTT_CLIENT_ID = "sensor_simulator"
 
 # Sensor Configuration
@@ -47,6 +67,7 @@ def on_connect(client, userdata, flags, rc):
         print(f"Failed to connect to MQTT broker with code {rc}")
 
 def main():
+    reset_database_if_needed()
     # Create MQTT client
     client = mqtt.Client(client_id=MQTT_CLIENT_ID)
     client.on_connect = on_connect
@@ -90,4 +111,6 @@ def main():
         print("Disconnected from MQTT broker")
 
 if __name__ == "__main__":
+    
     main()
+
