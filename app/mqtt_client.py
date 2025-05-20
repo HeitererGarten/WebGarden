@@ -7,6 +7,8 @@ from sqlalchemy.orm import Session
 
 from config import MQTT_BROKER_HOST, MQTT_BROKER_PORT, MQTT_TOPIC, MQTT_CLIENT_ID, POLLING_INTERVAL
 from app.database import SessionLocal, add_sensor_reading
+import os
+
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
